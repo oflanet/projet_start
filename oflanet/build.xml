@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="appengine-upload" default="default">
+   
+    <description>
+        This project provides helper tasks for appengine
+    </description>
+
+    <!-- Allow overriding of properties -->
+    <property file="./build.properties"/>
+   
+    <property name="appcfg.command" value="./appcfg.sh"/>
+    <property name="uber.target.dir" location="./target"/>
+   
+    <!-- ================================= -->
+    <target name="default" description="Do nothing">
+    </target>
+   
+    <!-- ================================= -->
+    <target name="update" depends="-update-check-variables" description="Updates appengine">
+        <property name="temp.dir" location="${uber.target.dir}/appengine"/>
+       
+        <delete dir="${temp.dir}" failonerror="false"/>
+       
+        <mkdir dir="${temp.dir}"/>
+       
+        <unjar dest="${temp.dir}">
+            <fileset dir="${uber.target.dir}">
+                <include name="*.war"/>
+            </fileset>
+        </unjar>
+   
+        <exec
+            executable="${appcfg.command}"
+            dir="${appcfg.dir}/bin"
+            inputstring="${appcfg.password}"
+            >
+            <arg line="--email=${appcfg.email} --passin update ${temp.dir}"/>
+        </exec>
+    </target>
+    <target name="-update-check-variables" description="Check variables">
+        <fail
+            unless="appcfg.dir"
+            message="Directory to appengine tools must be specified in 'appcfg.dir'"/>
+        <fail
+            unless="appcfg.email"
+            message="Appengine e-mail must be specified in 'appcfg.email'"/>
+        <fail
+            unless="appcfg.password"
+            message="Appengine password must be specified in 'appcfg.password'"/>
+    </target>
+</project>
